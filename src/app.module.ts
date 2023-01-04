@@ -7,6 +7,7 @@ import { SnakeNamingStrategy } from 'typeorm-naming-strategies';
 import { UserModule } from '@app/user/user.module';
 import { ConfigModule } from '@nestjs/config';
 import { AuthMiddleware } from '@app/user/middlewares/auth.middleware';
+import { ArticleModule } from '@app/article/article.module';
 
 @Module({
   imports: [
@@ -25,6 +26,7 @@ import { AuthMiddleware } from '@app/user/middlewares/auth.middleware';
     ConfigModule.forRoot({ cache: true }),
     TagModule,
     UserModule,
+    ArticleModule,
   ],
   controllers: [AppController],
   providers: [AppService],

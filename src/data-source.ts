@@ -1,7 +1,7 @@
 import { DataSource } from 'typeorm';
 import { SnakeNamingStrategy } from 'typeorm-naming-strategies';
 
-export const AppDataSource = new DataSource({
+const AppDataSource = new DataSource({
   type: 'postgres',
   host: 'localhost',
   port: 5432,
@@ -13,3 +13,11 @@ export const AppDataSource = new DataSource({
   synchronize: false,
   namingStrategy: new SnakeNamingStrategy(),
 });
+
+AppDataSource.initialize()
+  .then(async () => {
+    console.log('Connection initialized with database...');
+  })
+  .catch((error) => console.log(error));
+
+export default AppDataSource;

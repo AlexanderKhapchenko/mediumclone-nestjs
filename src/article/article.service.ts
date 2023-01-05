@@ -1,18 +1,23 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { UserEntity } from '@app/user/user.entity';
 import { PersistArticleDto } from '@app/article/dto/persist-article.dto';
-import { ArticleEntity } from '@app/article/article.entity';
+import { ArticleEntity } from './article.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { DeleteResult, Repository } from 'typeorm';
 import { ArticleResponseInterface } from '@app/article/types/article-response.interface';
 import slugify from 'slugify';
 import { generate } from 'short-uuid';
+import { ArticlesResponseInterface } from '@app/article/types/articles-response.interface';
+import AppDataSource from '@app/data-source';
+import { ArticlesQueryInterface } from '@app/article/types/articles-query.interface';
 
 @Injectable()
 export class ArticleService {
   constructor(
     @InjectRepository(ArticleEntity)
     private readonly articleRepository: Repository<ArticleEntity>,
+    @InjectRepository(UserEntity)
+    private readonly userRepository: Repository<UserEntity>,
   ) {}
 
   async create(
@@ -75,6 +80,45 @@ export class ArticleService {
     Object.assign(article, updateArticleDto);
 
     return await this.articleRepository.save(article);
+  }
+
+  async findAll(
+    currentUserId: number,
+    query: ArticlesQueryInterface,
+  ): Promise<ArticlesResponseInterface> {
+    const queryBuilder = AppDataSource.getRepository(ArticleEntity)
+      .createQueryBuilder('articles')
+      .leftJoinAndSelect('articles.author', 'author')
+      .orderBy('articles.createdAt', 'DESC');
+
+    if (query.author) {
+      const author = await this.userRepository.findOne({
+        where: {
+          username: query.author,
+        },
+      });
+
+      queryBuilder.andWhere('article.author = :id', {
+        id: author.id,
+      });
+    }
+
+    if (query.tag) {
+      queryBuilder.andWhere('articles.tagList LIKE :tag', {
+        tag: `%${query.tag}%`,
+      });
+    }
+
+    query.limit && queryBuilder.limit(query.limit);
+    query.offset && queryBuilder.offset(query.offset);
+
+    const articles = await queryBuilder.getMany();
+    const articlesCount = await queryBuilder.getCount();
+
+    return {
+      articles,
+      articlesCount,
+    };
   }
 
   buildArticleResponse(article: ArticleEntity): ArticleResponseInterface {

@@ -87,9 +87,9 @@ export class ArticleService {
     query: ArticlesQueryInterface,
   ): Promise<ArticlesResponseInterface> {
     const queryBuilder = AppDataSource.getRepository(ArticleEntity)
-      .createQueryBuilder('articles')
-      .leftJoinAndSelect('articles.author', 'author')
-      .orderBy('articles.createdAt', 'DESC');
+      .createQueryBuilder('article')
+      .leftJoinAndSelect('article.author', 'author')
+      .orderBy('article.createdAt', 'DESC');
 
     if (query.author) {
       const author = await this.userRepository.findOne({
@@ -104,7 +104,7 @@ export class ArticleService {
     }
 
     if (query.tag) {
-      queryBuilder.andWhere('articles.tagList LIKE :tag', {
+      queryBuilder.andWhere('article.tagList LIKE :tag', {
         tag: `%${query.tag}%`,
       });
     }

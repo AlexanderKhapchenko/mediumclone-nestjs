@@ -1,7 +1,12 @@
-import { DataSource } from 'typeorm';
+import { DataSource, DataSourceOptions } from 'typeorm';
 import { SnakeNamingStrategy } from 'typeorm-naming-strategies';
+import { SeederOptions } from 'typeorm-extension';
+import UserSeeder from './seeder/user.seeder';
+import TagSeeder from './seeder/tag.seeder';
+import ArticleSeeder from './seeder/article.seeder';
+import UserFactory from './seeder/factory/user.factory';
 
-const AppDataSource = new DataSource({
+const option: DataSourceOptions & SeederOptions = {
   type: 'postgres',
   host: 'localhost',
   port: 5432,
@@ -12,12 +17,10 @@ const AppDataSource = new DataSource({
   migrations: [__dirname + '/migrations/**/*{.ts,.js}'],
   synchronize: false,
   namingStrategy: new SnakeNamingStrategy(),
-});
+  seeds: [UserSeeder, TagSeeder, ArticleSeeder],
+  factories: [UserFactory],
+};
 
-AppDataSource.initialize()
-  .then(async () => {
-    console.log('Connection initialized with database...');
-  })
-  .catch((error) => console.log(error));
+const AppDataSource = new DataSource(option);
 
 export default AppDataSource;

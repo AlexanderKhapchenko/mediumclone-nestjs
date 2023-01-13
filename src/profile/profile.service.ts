@@ -29,6 +29,10 @@ export class ProfileService {
       throw new HttpException('Profile does not exist', HttpStatus.NOT_FOUND);
     }
 
+    if (!currentUserId) {
+      return { ...user, following: false };
+    }
+
     const follow = await this.followRepository.findOne({
       where: {
         followerId: currentUserId,
@@ -51,10 +55,6 @@ export class ProfileService {
 
     if (!user) {
       throw new HttpException('Profile does not exist', HttpStatus.NOT_FOUND);
-    }
-
-    if (!currentUserId) {
-      return { ...user, following: false };
     }
 
     if (currentUserId === user.id) {

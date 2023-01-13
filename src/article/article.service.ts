@@ -8,7 +8,7 @@ import { ArticleResponseInterface } from '@app/article/types/article-response.in
 import slugify from 'slugify';
 import { generate } from 'short-uuid';
 import { ArticlesResponseInterface } from '@app/article/types/articles-response.interface';
-import AppDataSource from '@app/data-source';
+import { getAppDataSource } from '@app/data-source';
 import { ArticlesQueryInterface } from '@app/article/types/articles-query.interface';
 
 @Injectable()
@@ -86,7 +86,9 @@ export class ArticleService {
     currentUserId: number,
     query: ArticlesQueryInterface,
   ): Promise<ArticlesResponseInterface> {
-    const queryBuilder = AppDataSource.getRepository(ArticleEntity)
+    const appDataSource = await getAppDataSource();
+    const queryBuilder = appDataSource
+      .getRepository(ArticleEntity)
       .createQueryBuilder('article')
       .leftJoinAndSelect('article.author', 'author')
       .orderBy('article.createdAt', 'DESC');

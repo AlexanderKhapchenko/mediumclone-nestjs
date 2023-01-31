@@ -23,7 +23,7 @@ const option: DataSourceOptions & SeederOptions = {
 
 const AppDataSource = new DataSource(option);
 
-export const getAppDataSource = async () => {
+export const getInitializedAppDataSource = async () => {
   if (AppDataSource.isInitialized) return AppDataSource;
 
   return await AppDataSource.initialize();

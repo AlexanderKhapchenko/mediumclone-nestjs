@@ -8,7 +8,7 @@ import { ArticleResponseInterface } from '@app/article/types/article-response.in
 import slugify from 'slugify';
 import { generate } from 'short-uuid';
 import { ArticlesResponseInterface } from '@app/article/types/articles-response.interface';
-import { getAppDataSource } from '@app/data-source';
+import { getInitializedAppDataSource } from '@app/data-source';
 import { ArticlesQueryInterface } from '@app/article/types/articles-query.interface';
 import { FollowEntity } from '@app/profile/follow.entity';
 
@@ -89,7 +89,7 @@ export class ArticleService {
     currentUserId: number,
     query: ArticlesQueryInterface,
   ): Promise<ArticlesResponseInterface> {
-    const appDataSource = await getAppDataSource();
+    const appDataSource = await getInitializedAppDataSource();
     const queryBuilder = appDataSource
       .getRepository(ArticleEntity)
       .createQueryBuilder('article')
@@ -177,7 +177,7 @@ export class ArticleService {
     }
 
     const followingIds = follows.map((follow) => follow.followingId);
-    const appDataSource = await getAppDataSource();
+    const appDataSource = await getInitializedAppDataSource();
     const queryBuilder = appDataSource
       .getRepository(ArticleEntity)
       .createQueryBuilder('article')
